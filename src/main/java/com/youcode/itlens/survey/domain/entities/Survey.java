@@ -1,17 +1,12 @@
 package com.youcode.itlens.survey.domain.entities;
 
-import com.youcode.itlens.owner.domain.entities.Owner;
+import com.youcode.itlens.owner.domain.Owner;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 @Getter
 @Setter

@@ -1,4 +1,4 @@
-package com.youcode.itlens.owner.domain.entities;
+package com.youcode.itlens.owner.domain;
 
 import com.youcode.itlens.survey.domain.entities.Survey;
 import jakarta.persistence.*;
