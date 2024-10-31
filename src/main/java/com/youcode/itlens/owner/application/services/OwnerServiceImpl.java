@@ -1,11 +1,16 @@
 package com.youcode.itlens.owner.application.services;
 
-import com.youcode.itlens.owner.application.mappers.OwnerRequestDTO;
-import com.youcode.itlens.owner.application.mappers.OwnerResponseDTO;
+import com.youcode.itlens.owner.application.dtos.OwnerRequestDTO;
+import com.youcode.itlens.owner.application.dtos.OwnerResponseDTO;
+import jakarta.transaction.Transactional;
+import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 import java.util.Optional;
-
+@Service
+@Transactional
+@Validated
 public class OwnerServiceImpl implements OwnerService {
     @Override
     public List<OwnerResponseDTO> getAll() {
