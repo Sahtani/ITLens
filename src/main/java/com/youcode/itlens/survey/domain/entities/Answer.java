@@ -19,9 +19,9 @@ public class Answer {
     private String text;
     private int selectionCount;
 
+    private double percentage;
+
     @ManyToOne
     private Question question;
-
-    private double percentage;
 
 }

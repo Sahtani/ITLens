@@ -6,15 +6,19 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import java.util.Set;
 
 
-@Entity
+
 @Getter
 @Setter
+@Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
+@Entity
+@Table(name = "owners")
 public class Owner {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

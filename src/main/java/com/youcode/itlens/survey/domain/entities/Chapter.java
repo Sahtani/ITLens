@@ -6,12 +6,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.Set;
-
+@Entity
+@Table(name = "chapters")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+
 public class Chapter {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,9 +23,12 @@ public class Chapter {
     private String title;
 
     @ManyToOne
-    private Survey survey;
+    private Chapter parentChapter;
+
+//   @ManyToOne
+//   private SurveyEdition surveyEdition;
 
     @OneToMany(mappedBy = "chapter", cascade = CascadeType.ALL)
-    private Set<SubChapter> subChapters;
+    private List<Question> questions;
 
 }

@@ -1,15 +1,16 @@
 package com.youcode.itlens.survey.domain.entities;
 
 import jakarta.persistence.*;
-
-import java.time.LocalDate;
-
+import jakarta.validation.constraints.Future;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Set;
+import javax.security.auth.Subject;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -17,13 +18,17 @@ public class SurveyEdition {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    @Future
     private LocalDate creationDate;
+    @Future
     private LocalDate startDate;
     private int year;
 
     @ManyToOne
-    @JoinColumn(name = "survey_id")
     private Survey survey;
+
+
+    @OneToMany(mappedBy = "surveyEdition", fetch = FetchType.EAGER)
+    private List<Chapter> chapters;
 
 }

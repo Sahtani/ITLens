@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -26,6 +28,10 @@ public class Question {
     private int answerCount;
 
     @ManyToOne
-    private SubChapter subChapter;
+    private Chapter chapter;
+
+
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
+    private List<Answer> answers;
 
 }
