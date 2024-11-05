@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Future;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.security.auth.Subject;
@@ -11,9 +12,13 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+
+@Entity
+@Table(name = "surveyeditions")
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 public class SurveyEdition {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

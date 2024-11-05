@@ -25,16 +25,15 @@ public class GlobalExceptionHandler {
                 ex.getMessage()
         );
     }
+
     @ExceptionHandler(DataIntegrityViolationException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handleDataIntegrityViolationException(DataIntegrityViolationException ex, HttpServletRequest request) {
-        ErrorResponse errorResponse = new ErrorResponse(
+        return new ErrorResponse(
                 LocalDateTime.now(),
                 HttpStatus.CONFLICT.value(),
                 "Data Integrity Violation",
                 ex.getMessage()
-
         );
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse).getBody();
     }
 }
