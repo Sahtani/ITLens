@@ -18,7 +18,6 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "owners")
 public class Owner {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
