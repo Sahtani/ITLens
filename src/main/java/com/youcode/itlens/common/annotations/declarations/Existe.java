@@ -1,21 +1,21 @@
 package com.youcode.itlens.common.annotations.declarations;
 
-
 import com.youcode.itlens.common.annotations.implementations.ExistValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
+@Documented
 @Constraint(validatedBy = ExistValidator.class)
-@Target(ElementType.TYPE)
+@Target({ElementType.PARAMETER, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Exist {
-    String message() default "L'entité existe déjà";
+public @interface Existe {
+
+    String message() default "L'entité n'existe pas";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
-}
 
+    Class<?> entityClass();
+    String fieldName();
+}

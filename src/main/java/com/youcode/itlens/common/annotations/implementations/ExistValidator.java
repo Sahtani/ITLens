@@ -1,21 +1,44 @@
 package com.youcode.itlens.common.annotations.implementations;
 
-import com.youcode.itlens.common.annotations.declarations.Exist;
+import com.youcode.itlens.common.annotations.declarations.Existe;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
-import java.lang.annotation.Annotation;
+@Component
+@RequiredArgsConstructor
+public class ExistValidator implements ConstraintValidator<Existe, Long> {
 
-public class ExistValidator implements ConstraintValidator<Exist, Object> {
+    private final EntityManager entityManager;
+    private Class<?> entityClass;
+    private String fieldName;
 
     @Override
-    public void initialize(Exist constraintAnnotation) {
-        ConstraintValidator.super.initialize(constraintAnnotation);
+    public void initialize(Existe constraintAnnotation) {
+        // Initialisation avec l'annotation
+        this.entityClass = constraintAnnotation.entityClass();
+        this.fieldName = constraintAnnotation.fieldName();
     }
 
     @Override
-    public boolean isValid(Object obj, ConstraintValidatorContext constraintValidatorContext) {
+    public boolean isValid(Long value, ConstraintValidatorContext context) {
+        if (value == null) {
+            return true;
+        }
 
-        return false;
+        try {
+
+            String queryStr = String.format("SELECT e FROM %s e WHERE e.%s = :value",
+                    entityClass.getSimpleName(), fieldName);
+            entityManager.createQuery(queryStr)
+                    .setParameter("value", value)
+                    .getSingleResult();
+            return true;
+        } catch (NoResultException e) {
+            return false;
+        }
     }
 }
