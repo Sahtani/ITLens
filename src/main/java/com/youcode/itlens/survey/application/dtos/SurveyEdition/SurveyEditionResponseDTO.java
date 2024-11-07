@@ -7,8 +7,8 @@ import java.time.LocalDateTime;
 import java.time.Year;
 
 public record SurveyEditionResponseDTO(@NotNull Long id,
+                                       @NotNull LocalDateTime creationDate,
                                        @NotNull LocalDateTime startDate,
-                                       @NotNull LocalDateTime endDate,
                                        @NotNull Year year,
                                        @NotNull SurveyEmbeddableDtTO survey
 ) {

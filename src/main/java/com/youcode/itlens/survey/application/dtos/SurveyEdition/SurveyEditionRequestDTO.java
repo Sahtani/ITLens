@@ -11,11 +11,11 @@ import java.time.Year;
 public record SurveyEditionRequestDTO(
         @NotNull
         @FutureOrPresent
-        LocalDateTime startDate,
+        LocalDateTime creationDate,
 
         @NotNull
         @Future
-        LocalDateTime endDate,
+        LocalDateTime startDate,
 
         @NotNull
         @FutureOrPresent
