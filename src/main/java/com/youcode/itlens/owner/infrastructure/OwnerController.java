@@ -3,6 +3,7 @@ package com.youcode.itlens.owner.infrastructure;
 import com.youcode.itlens.owner.application.dtos.OwnerRequestDTO;
 import com.youcode.itlens.owner.application.dtos.OwnerResponseDTO;
 import com.youcode.itlens.owner.application.services.OwnerService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -19,7 +20,7 @@ public class OwnerController {
     private final OwnerService ownerService;
 
     @PostMapping
-    public ResponseEntity<OwnerResponseDTO> create(@RequestBody OwnerRequestDTO owner) {
+    public ResponseEntity<OwnerResponseDTO> create(@Valid @RequestBody OwnerRequestDTO owner) {
         OwnerResponseDTO createdOwner = ownerService.save(owner);
         return new ResponseEntity<>(createdOwner, HttpStatus.CREATED);
     }
