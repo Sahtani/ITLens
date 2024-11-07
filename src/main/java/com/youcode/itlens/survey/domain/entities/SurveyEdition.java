@@ -2,6 +2,7 @@ package com.youcode.itlens.survey.domain.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,6 +10,7 @@ import lombok.Setter;
 
 import javax.security.auth.Subject;
 import java.time.LocalDate;
+import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,11 +25,15 @@ public class SurveyEdition {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Future
+
+    @NotNull
     private LocalDate creationDate;
-    @Future
+
+    @NotNull
     private LocalDate startDate;
-    private int year;
+
+    @NotNull
+    private Year year;
 
     @ManyToOne
     private Survey survey;

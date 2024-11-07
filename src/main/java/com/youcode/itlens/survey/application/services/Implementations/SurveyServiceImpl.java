@@ -15,27 +15,28 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
 @Validated
 public class SurveyServiceImpl implements SurveyService {
 
-    private final SurveyRepository repository;
+    private final SurveyRepository surveyRepository;
     private final OwnerRepository ownerRepository;
     private final SurveyMapper mapper;
 
     @Override
     public List<SurveyResponseDTO> getAll() {
 
-        return repository.findAll()
+        return surveyRepository.findAll()
                 .stream().map(mapper::toDto)
                 .toList();
     }
 
     @Override
     public SurveyResponseDTO getById(Long id) {
-        return repository.findById(id)
+        return surveyRepository.findById(id)
                 .map(mapper::toDto)
                 .orElseThrow(() -> new EntityNotFoundException("survey"));
     }
@@ -47,17 +48,29 @@ public class SurveyServiceImpl implements SurveyService {
         Survey survey = mapper.toEntity(surveyRequestDTO)
                 .setOwner(owner);
 
-        Survey savedSurvey = repository.save(survey);
+        Survey savedSurvey = surveyRepository.save(survey);
         return mapper.toDto(savedSurvey);
     }
 
     @Override
     public SurveyResponseDTO update(Long id, SurveyRequestDTO surveyRequestDTO) {
-        return null;
+        Survey survey = surveyRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("survey"));
+        Owner owner = ownerRepository.findById(surveyRequestDTO.ownerId())
+                .orElseThrow(() -> new EntityNotFoundException("owner"));
+
+        survey.setTitle(surveyRequestDTO.title())
+                .setDescription(surveyRequestDTO.description())
+                .setOwner(owner);
+
+        return mapper.toDto(survey);
     }
 
     @Override
-    public boolean delete(Long aLong) {
-        return false;
+    public void delete(Long id) {
+        if (!surveyRepository.existsById(id))
+            throw new EntityNotFoundException("survey");
+
+        surveyRepository.deleteById(id);
     }
 }

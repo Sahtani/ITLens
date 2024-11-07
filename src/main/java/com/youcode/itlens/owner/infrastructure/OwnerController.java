@@ -41,7 +41,7 @@ public class OwnerController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<OwnerResponseDTO> update(@PathVariable Long id, @RequestBody OwnerRequestDTO owner) {
+    public ResponseEntity<OwnerResponseDTO> update(@PathVariable Long id, @RequestBody @Valid OwnerRequestDTO owner) {
         OwnerResponseDTO updatedOwner = ownerService.update(id, owner);
         if (updatedOwner != null) {
             return new ResponseEntity<>(updatedOwner, HttpStatus.OK);
@@ -51,9 +51,7 @@ public class OwnerController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        if (ownerService.delete(id)) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        ownerService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

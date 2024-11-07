@@ -8,6 +8,6 @@ public interface GenericService<T, ID ,RequestDto, ResponseDto> {
     ResponseDto getById(ID id);
     ResponseDto save(RequestDto requestDto);
     ResponseDto update(Long id,RequestDto requestDto);
-    boolean delete(ID id);
+    void delete(ID id);
 
 }
