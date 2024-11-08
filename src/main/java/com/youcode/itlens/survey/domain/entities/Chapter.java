@@ -25,10 +25,18 @@ public class Chapter {
     @ManyToOne
     private Chapter parentChapter;
 
-   @ManyToOne
+    @OneToMany(mappedBy = "parentChapter")
+    private List<Chapter> subChapters ;
+
+
+    @ManyToOne
    private SurveyEdition surveyEdition;
 
     @OneToMany(mappedBy = "chapter", cascade = CascadeType.ALL)
     private List<Question> questions;
+
+    public boolean isSubChapter() {
+        return parentChapter != null;
+    }
 
 }
