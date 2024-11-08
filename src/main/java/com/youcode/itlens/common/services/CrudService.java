@@ -5,6 +5,8 @@ import java.util.List;
 public interface CrudService<RequestDTO, ResponseDTO, ID> {
     ResponseDTO save(RequestDTO requestDto);
 
+    ResponseDTO update(ID id, RequestDTO requestDto);
+
     ResponseDTO findById(ID id);
 
     List<ResponseDTO> findAll();

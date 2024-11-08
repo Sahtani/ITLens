@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/v1/surveyeditions")
+@RequestMapping("api/v1/survey-editions")
 @RequiredArgsConstructor
 class SurveyEditionController {
     private final SurveyEditionService service;
