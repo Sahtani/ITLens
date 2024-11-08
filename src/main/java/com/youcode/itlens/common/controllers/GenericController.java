@@ -1,6 +1,7 @@
 package com.youcode.itlens.common.controllers;
 
 import com.youcode.itlens.common.services.CrudService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -34,7 +35,7 @@ public abstract class GenericController<T, RequestDTO, ResponseDTO, ID> {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ResponseDTO> update(@PathVariable ID id, @RequestBody RequestDTO requestDto) {
+    public ResponseEntity<ResponseDTO> update(@PathVariable ID id, @RequestBody @Valid RequestDTO requestDto) {
         ResponseDTO updatedDto = service.update(id, requestDto);
         return updatedDto != null ? ResponseEntity.ok(updatedDto) : ResponseEntity.notFound().build();
     }

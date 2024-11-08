@@ -60,8 +60,5 @@ public class ChapterServiceImpl extends GenericCrudServiceImpl<Chapter, ChapterR
         return mapper.toDto(savedChapter);
     }
 
-    @Override
-    public ChapterResponseDTO update(Long id, ChapterRequestDTO requestDto) {
-        return null;
-    }
+
 }

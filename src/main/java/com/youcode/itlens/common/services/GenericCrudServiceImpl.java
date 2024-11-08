@@ -1,6 +1,7 @@
 package com.youcode.itlens.common.services;
 
 import com.youcode.itlens.common.mappers.GenericMapper;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 @Validated
 @AllArgsConstructor
@@ -41,5 +43,20 @@ public abstract class GenericCrudServiceImpl<T, RequestDTO, ResponseDTO, ID> imp
     @Override
     public void deleteById(ID id) {
         repository.deleteById(id);
+    }
+
+    @Override
+    public ResponseDTO update(ID id, RequestDTO requestDto) {
+        Optional<T> existingEntity = repository.findById(id);
+        if (existingEntity.isPresent()) {
+            T entity = existingEntity.get();
+            mapper.toEntity(requestDto  );
+
+            T updatedEntity = repository.save(entity);
+
+            return mapper.toDto(updatedEntity);
+        } else {
+            throw new EntityNotFoundException("Entity with ID " + id + " not found.");
+        }
     }
 }
