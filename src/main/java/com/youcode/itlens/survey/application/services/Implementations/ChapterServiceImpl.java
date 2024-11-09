@@ -40,6 +40,7 @@ public class ChapterServiceImpl extends GenericCrudServiceImpl<Chapter, ChapterR
         return chapterRepository.findAllBySurveyEditionId(editionId).stream().map(mapper::toDto).toList();
     }
 
+    @Override
     public ChapterResponseDTO save(ChapterRequestDTO requestDto) {
         SurveyEdition surveyEdition = surveyEditionRepository.findById(requestDto.surveyEditionId()).orElseThrow(() -> new EntityNotFoundException("Survey edition with ID " + requestDto.surveyEditionId() + " not found"));
 
@@ -58,6 +59,14 @@ public class ChapterServiceImpl extends GenericCrudServiceImpl<Chapter, ChapterR
         }
         Chapter savedChapter = chapterRepository.save(chapter);
         return mapper.toDto(savedChapter);
+    }
+    @Override
+    public ChapterResponseDTO update(Long id, ChapterRequestDTO dto) {
+        Chapter chapter = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Chapter not found for ID:  " + id));
+
+        chapter.setTitle(dto.title());
+        return mapper.toDto(chapter);
     }
 
 
