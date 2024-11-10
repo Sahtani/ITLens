@@ -1,6 +1,7 @@
 package com.youcode.itlens.common.infrastructure.exception;
 
 import com.youcode.itlens.common.domain.ErrorResponse;
+import com.youcode.itlens.survey.domain.exception.DuplicateChapterTitleException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
@@ -66,5 +67,13 @@ public class GlobalExceptionHandler {
             errors.put(fieldName, errorMessage);
         });
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(DuplicateChapterTitleException.class)
+    public ResponseEntity<Map<String, String>> handleDuplicateChapterTitleException(DuplicateChapterTitleException ex) {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", "Duplicate Chapter Title");
+        errorResponse.put("message", ex.getMessage());
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
     }
 }

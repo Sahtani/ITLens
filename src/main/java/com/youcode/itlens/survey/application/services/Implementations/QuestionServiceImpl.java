@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Validated
 @Service
@@ -41,8 +42,8 @@ public class QuestionServiceImpl extends GenericCrudServiceImpl<Question, Questi
 
     @Override
     public QuestionResponseDTO save(QuestionRequestDTO requestDTO) {
-        if (requestDTO.chapterId() != null) {
-            Chapter chapter = chapterRepository.findById(requestDTO.chapterId()).orElseThrow(() -> new EntityNotFoundException("Chapter with ID " + requestDTO.chapterId() + " not found."));
+
+        Chapter chapter = chapterRepository.findById(requestDTO.chapterId()).orElseThrow(() -> new EntityNotFoundException("Chapter with ID " + requestDTO.chapterId() + " not found."));
             Question question = mapper.toEntity(requestDTO);
 
             // set the chapter
@@ -60,10 +61,38 @@ public class QuestionServiceImpl extends GenericCrudServiceImpl<Question, Questi
             Question savedQuestion = questionRepository.save(question);
 
             return mapper.toDto(savedQuestion);
-        } else {
-            throw new IllegalArgumentException("Chapter ID must be provided.");
-        }
+
     }
+
+    @Override
+    public QuestionResponseDTO update(Long id, QuestionRequestDTO requestDTO) {
+        Question existingQuestion = questionRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Question with ID " + id + " not found."));
+
+        if (requestDTO.chapterId() != null) {
+            Chapter chapter = chapterRepository.findById(requestDTO.chapterId())
+                    .orElseThrow(() -> new EntityNotFoundException("Chapter with ID " + requestDTO.chapterId() + " not found."));
+            existingQuestion.setChapter(chapter);
+        }
+
+        existingQuestion.setText(requestDTO.text());
+        existingQuestion.setType(requestDTO.questionType());
+
+        // Update answers if provided
+        if (requestDTO.answerRequestDTOS() != null) {
+            List<Answer> updatedAnswers = requestDTO.answerRequestDTOS().stream()
+                    .map(answerDTO -> {
+                        Answer answer = answerMapper.toEntity(answerDTO);
+                        answer.setQuestion(existingQuestion);
+                        return answer;
+                    })
+                    .collect(Collectors.toList());
+            existingQuestion.setAnswers(updatedAnswers);
+        }
+        Question updatedQuestion = questionRepository.save(existingQuestion);
+        return mapper.toDto(updatedQuestion);
+    }
+
 
 
 }
