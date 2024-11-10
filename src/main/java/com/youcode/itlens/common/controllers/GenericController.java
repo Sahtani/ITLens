@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-public abstract class GenericController<T, RequestDTO, ResponseDTO, ID> {
+public abstract class GenericController<RequestDTO, ResponseDTO, ID> {
 
     protected final CrudService<RequestDTO, ResponseDTO, ID> service;
 

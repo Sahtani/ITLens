@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/chapters")
-public class ChapterController extends GenericController<Chapter, ChapterRequestDTO, ChapterResponseDTO, Long> {
+public class ChapterController extends GenericController<ChapterRequestDTO, ChapterResponseDTO, Long> {
 
     public ChapterController(ChapterService chapterService) {
         super(chapterService);
