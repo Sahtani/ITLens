@@ -1,32 +1,43 @@
-package com.youcode.itlens.survey.application.controllers;
+package com.youcode.itlens.survey.infrastructure;
 
-import com.youcode.itlens.survey.application.dtos.Participate.SurveyParticipationRequest;
+import com.youcode.itlens.survey.application.dtos.Participate.SurveyParticipationRequestDTO;
 import com.youcode.itlens.survey.application.services.SurveyParticipationService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/surveys")
+@RequestMapping("/api/v1/surveys")
 @RequiredArgsConstructor
 public class SurveyParticipationController {
 
-    private final SurveyParticipationService surveyParticipationService;
+    private SurveyParticipationService surveyParticipationService;
 
-    @PostMapping("/{surveyId}/participate")
-    public ResponseEntity<Void> participate(@PathVariable Long surveyId, @RequestBody @Valid SurveyParticipationRequest dto) {
+    /**
+     * Endpoint to handle survey participation.
+     *
+     * @param request The survey participation request (containing responses).
+     * @return A response indicating the success or failure of the operation.
+     */
+    @PostMapping("/participate")
+    public ResponseEntity<String> participate(@RequestBody SurveyParticipationRequestDTO request) {
+        try {
+            // Process the survey participation
+            surveyParticipationService.handleSurveyParticipation(request);
 
-        if (dto.simpleAnswerDTO() != null) {
-            surveyParticipationService.participateWithSingleAnswer(surveyId, List.of(dto.simpleAnswerDTO()));
-        } else if (dto.multipleAnswerDTO() != null) {
-            surveyParticipationService.participateWithMultipleAnswers(surveyId, List.of(dto.multipleAnswerDTO()));
-        } else {
-            return ResponseEntity.badRequest().build();
+            // Return success response
+            return ResponseEntity.ok("Survey participation successfully recorded.");
+        } catch (EntityNotFoundException e) {
+            // Handle entity not found exception (e.g., question or answer not found)
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Entity not found: " + e.getMessage());
+        } catch (Exception e) {
+            // Handle any other unexpected errors
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + e.getMessage());
         }
-        return ResponseEntity.noContent().build();
     }
-
 }

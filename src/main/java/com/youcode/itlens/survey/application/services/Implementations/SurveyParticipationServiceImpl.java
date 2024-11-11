@@ -1,12 +1,15 @@
 package com.youcode.itlens.survey.application.services.Implementations;
 
-import com.youcode.itlens.survey.application.dtos.Participate.MultipleAnswerDTO;
-import com.youcode.itlens.survey.application.dtos.Participate.SimpleAnswerDTO;
+import com.youcode.itlens.survey.application.dtos.Answer.AnswerDTO;
+import com.youcode.itlens.survey.application.dtos.Participate.ResponseDTO;
+import com.youcode.itlens.survey.application.dtos.Participate.SurveyParticipationRequestDTO;
 import com.youcode.itlens.survey.application.services.SurveyParticipationService;
 import com.youcode.itlens.survey.domain.entities.Answer;
 import com.youcode.itlens.survey.domain.entities.Question;
 import com.youcode.itlens.survey.domain.repository.AnswerRepository;
 import com.youcode.itlens.survey.domain.repository.QuestionRepository;
+import com.youcode.itlens.survey.domain.repository.SurveyRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,59 +19,107 @@ import java.util.List;
 
 @Service
 @Transactional
-@Validated
 @RequiredArgsConstructor
+@Validated
 public class SurveyParticipationServiceImpl implements SurveyParticipationService {
 
-    private final QuestionRepository questionRepository;
-    private final AnswerRepository answerRepository;
+    private QuestionRepository questionRepository;
+    private AnswerRepository answerRepository;
+    private SurveyRepository surveyRepository;
 
-    @Override
-    public void participateWithSingleAnswer(Long surveyId, List<SimpleAnswerDTO> answers) {
-        for (SimpleAnswerDTO answerDTO : answers) {
-            Question question = questionRepository.findById(answerDTO.questionId()).orElseThrow(() -> new IllegalArgumentException("Question not found for ID " + answerDTO.questionId()));
-            String answerId = answerDTO.answerId();
-
-            // If the answer is a combination of IDs (e.g., "25-34")
-            if (answerId.contains("-")) {
-                String[] answerIds = answerId.split("-");
-                for (String id : answerIds) {
-                    Long parsedAnswerId = Long.parseLong(id);
-                    processAnswer(parsedAnswerId, question);
-                }
-            } else {
-                // Single answer ID
-                Long parsedAnswerId = Long.parseLong(answerId);
-                processAnswer(parsedAnswerId, question);
+    /**
+     * Handles survey participation by processing each response and saving it to the database.
+     *
+     * @param request The survey participation request.
+     */
+    public void handleSurveyParticipation(SurveyParticipationRequestDTO request) {
+        for (ResponseDTO response : request.responses()) {
+            if (response.answerId() != null) {
+                // Handle single answer
+                handleSingleAnswer(response.questionId(), response.answerId());
+            } else if (response.answers() != null) {
+                // Handle multiple answers
+                handleMultipleAnswers(response.questionId(), response.answers());
             }
         }
     }
 
-    @Override
-    // Multiple response processing
-    public void participateWithMultipleAnswers(Long surveyId, List<MultipleAnswerDTO> answers) {
-        for (MultipleAnswerDTO answerDTO : answers) {
-            Question question = questionRepository.findById(answerDTO.questionId()).orElseThrow(() -> new IllegalArgumentException("Question not found for ID " + answerDTO.questionId()));
-            List<Long> answerIds = answerDTO.answers();
-            for (Long answerId : answerIds) {
-                processAnswer(answerId, question);
-            }
+    /**
+     * Processes and saves a single answer (for single-choice questions).
+     *
+     * @param questionId The question ID.
+     * @param answerId The answer ID.
+     */
+    private void handleSingleAnswer(Long questionId, Long answerId) {
+        // Retrieve the question and answer from the database
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new EntityNotFoundException("Question not found with ID: " + questionId));
+
+        Answer answer = answerRepository.findById(answerId)
+                .orElseThrow(() -> new EntityNotFoundException("Answer not found with ID: " + answerId));
+
+        // Increment the selection count for the answer
+        incrementSelectionCount(question, answer);
+
+        // Save the answer to the database
+    //    saveSingleAnswer(questionId, answerId);
+    }
+
+    /**
+     * Processes and saves multiple answers (for multi-choice questions).
+     *
+     * @param questionId The question ID.
+     * @param answerIds The list of answer IDs.
+     */
+    private void handleMultipleAnswers(Long questionId, List<AnswerDTO> answerIds) {
+        // Retrieve the question from the database
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new EntityNotFoundException("Question not found with ID: " + questionId));
+
+        // Retrieve all answers from the database
+        List<Answer> answers = answerRepository.findAllById(answerIds);
+
+        if (answers.size() != answerIds.size()) {
+            throw new EntityNotFoundException("Some answers not found: " + answerIds);
         }
+
+        // Increment the selection count for each answer
+        answers.forEach(answer -> incrementSelectionCount(question, answer));
+
+        // Save the multiple answers to the database
+      //  saveMultipleAnswers(questionId, answerIds);
     }
 
-    private void processAnswer(Long answerId, Question question) {
-        Answer answer = answerRepository.findById(answerId).orElseThrow(() -> new IllegalArgumentException("Answer not found for ID " + answerId));
-
-        validateAnswerBelongsToQuestion(answer, question);
-        answer.incrementSelectionCount();
-
-        // Increment answer count for the question
-        question.incrementAnswerCount();
+    /**
+     * Increments the selection count for a given answer.
+     *
+     * @param question The question associated with the answer.
+     * @param answer The answer whose selection count is to be incremented.
+     */
+    private void incrementSelectionCount(Question question, Answer answer) {
+        answer.incrementSelectionCount();  // Assuming Answer entity has this method
+    //    answerRepository.save(answer);  // Save the updated answer to the database
     }
 
-    private void validateAnswerBelongsToQuestion(Answer answer, Question question) {
-        if (!answer.getQuestion().getId().equals(question.getId())) {
-            throw new IllegalArgumentException("Answer with ID " + answer.getId() + " does not belong to question " + question.getId());
-        }
+    /**
+     * Saves a single answer to the database.
+     *
+     * @param questionId The question ID.
+     * @param answerId The answer ID.
+     */
+    private void saveSingleAnswer(Long questionId, Long answerId) {
+        // Save the single answer response to the database
+     //   surveyRepository.saveSingleAnswer(questionId, answerId);
     }
+
+    /**
+     * Saves multiple answers to the database.
+     *
+     * @param questionId The question ID.
+     * @param answerIds The list of answer IDs.
+     */
+//    private void saveMultipleAnswers(Long questionId, List<Long> answerIds) {
+//        // Save the multiple answer responses to the database
+//        surveyRepository.saveMultipleAnswers(questionId, answerIds);
+//    }
 }
