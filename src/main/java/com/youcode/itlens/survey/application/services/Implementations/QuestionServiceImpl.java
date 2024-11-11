@@ -9,6 +9,7 @@ import com.youcode.itlens.survey.application.services.QuestionService;
 import com.youcode.itlens.survey.domain.entities.Answer;
 import com.youcode.itlens.survey.domain.entities.Chapter;
 import com.youcode.itlens.survey.domain.entities.Question;
+import com.youcode.itlens.survey.domain.exception.ChapterHasSubChaptersException;
 import com.youcode.itlens.survey.domain.repository.ChapterRepository;
 import com.youcode.itlens.survey.domain.repository.QuestionRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -43,6 +44,7 @@ public class QuestionServiceImpl extends GenericCrudServiceImpl<Question, Questi
     @Override
     public QuestionResponseDTO save(QuestionRequestDTO requestDTO) {
 
+        ensureIsLeafChapter(requestDTO.chapterId());
         Chapter chapter = chapterRepository.findById(requestDTO.chapterId()).orElseThrow(() -> new EntityNotFoundException("Chapter with ID " + requestDTO.chapterId() + " not found."));
             Question question = mapper.toEntity(requestDTO);
 
@@ -66,6 +68,9 @@ public class QuestionServiceImpl extends GenericCrudServiceImpl<Question, Questi
 
     @Override
     public QuestionResponseDTO update(Long id, QuestionRequestDTO requestDTO) {
+
+        ensureIsLeafChapter(requestDTO.chapterId());
+
         Question existingQuestion = questionRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Question with ID " + id + " not found."));
 
@@ -93,6 +98,12 @@ public class QuestionServiceImpl extends GenericCrudServiceImpl<Question, Questi
         return mapper.toDto(updatedQuestion);
     }
 
+    // Ensure the chapter does not have any subchapters
+    private void ensureIsLeafChapter(Long chapterId) {
+        if (chapterRepository.hasSubChapters(chapterId)) {
+            throw new ChapterHasSubChaptersException(chapterId);
+        }
+    }
 
 
 }
