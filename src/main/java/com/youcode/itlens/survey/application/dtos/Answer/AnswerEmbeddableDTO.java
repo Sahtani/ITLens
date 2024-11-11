@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotNull;
 
 public record AnswerEmbeddableDTO(@NotNull Long id,
                                   @NotBlank String text,
-                                  @NotNull int selectionCount,
-                                  @NotNull double percentage
+                                  @NotNull int selectionCount
 ) {
 }

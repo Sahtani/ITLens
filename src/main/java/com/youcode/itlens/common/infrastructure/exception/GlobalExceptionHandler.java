@@ -1,6 +1,7 @@
 package com.youcode.itlens.common.infrastructure.exception;
 
 import com.youcode.itlens.common.domain.ErrorResponse;
+import com.youcode.itlens.survey.domain.exception.ChapterHasSubChaptersException;
 import com.youcode.itlens.survey.domain.exception.DuplicateChapterTitleException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -75,5 +76,19 @@ public class GlobalExceptionHandler {
         errorResponse.put("message", ex.getMessage());
 
         return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+    }
+    // To handle the ChapterHasSubChaptersException
+    @ExceptionHandler(ChapterHasSubChaptersException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleChapterHasSubChaptersException(ChapterHasSubChaptersException ex) {
+        // Create the ErrorResponse with status, error, and message
+        return new  ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                ex.getMessage()
+        );
+
+
     }
 }
