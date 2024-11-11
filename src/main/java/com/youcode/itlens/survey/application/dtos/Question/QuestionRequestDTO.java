@@ -12,7 +12,7 @@ import java.util.List;
 public record QuestionRequestDTO(@NotBlank String text,
                                  @NotNull @Existe(entityClass = Chapter.class, fieldName = "id", message = "no chapter exist with this id")
                                  Long chapterId,
-                                 @NotNull QuestionType questionType,
+                                 @NotBlank QuestionType type,
                                  @NotNull List<AnswerRequestDTO> answerRequestDTOS
 ) {
 }

@@ -81,7 +81,7 @@ public class QuestionServiceImpl extends GenericCrudServiceImpl<Question, Questi
         }
 
         existingQuestion.setText(requestDTO.text());
-        existingQuestion.setType(requestDTO.questionType());
+        existingQuestion.setType(requestDTO.type());
 
         // Update answers if provided
         if (requestDTO.answerRequestDTOS() != null) {

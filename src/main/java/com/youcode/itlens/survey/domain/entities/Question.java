@@ -2,6 +2,7 @@ package com.youcode.itlens.survey.domain.entities;
 
 import com.youcode.itlens.survey.domain.enums.QuestionType;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,6 +25,7 @@ public class Question {
 
     private String text;
 
+    @NotBlank
     @Enumerated(EnumType.STRING)
     private QuestionType type;
 
@@ -35,5 +37,9 @@ public class Question {
 
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
     private List<Answer> answers;
+
+    public void incrementAnswerCount() {
+        this.answerCount++;
+    }
 
 }

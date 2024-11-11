@@ -27,4 +27,8 @@ public class Answer {
     @ManyToOne
     private Question question;
 
+    public void incrementSelectionCount() {
+        this.selectionCount++;
+    }
+
 }
