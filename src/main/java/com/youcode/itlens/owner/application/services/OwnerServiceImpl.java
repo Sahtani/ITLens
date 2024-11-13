@@ -5,9 +5,12 @@ import com.youcode.itlens.owner.application.dtos.OwnerResponseDTO;
 import com.youcode.itlens.owner.application.mappers.OwnerMapper;
 import com.youcode.itlens.owner.domain.Owner;
 import com.youcode.itlens.owner.domain.OwnerRepository;
+import com.youcode.itlens.survey.application.dtos.PagedResponse;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -17,14 +20,19 @@ import java.util.List;
 @Transactional
 @Validated
 @RequiredArgsConstructor
+
 public class OwnerServiceImpl implements OwnerService {
 
     private final OwnerRepository ownerRepository;
     private final OwnerMapper ownerMapper;
     @Override
-    public List<OwnerResponseDTO> getAll() {
-        return ownerRepository.findAll().stream().map(ownerMapper::toDto).toList();
+    public PagedResponse<OwnerResponseDTO> getAll(Pageable pageable) {
+        Page<Owner> ownersPage = ownerRepository.findAll(pageable);
+        List<OwnerResponseDTO> ownerResponseDTOs = ownersPage.getContent().stream().map(ownerMapper::toDto).toList();
+
+        return new PagedResponse<>(ownerResponseDTOs, ownersPage.getNumber(), ownersPage.getSize(), ownersPage.getTotalElements(), ownersPage.getTotalPages(), ownersPage.isLast());
     }
+
 
     @Override
     public OwnerResponseDTO getById(Long id) {

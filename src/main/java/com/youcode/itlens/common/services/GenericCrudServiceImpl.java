@@ -1,11 +1,15 @@
 package com.youcode.itlens.common.services;
 
 import com.youcode.itlens.common.mappers.GenericMapper;
+import com.youcode.itlens.survey.application.dtos.PagedResponse;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
@@ -18,10 +22,6 @@ public abstract class GenericCrudServiceImpl<T, RequestDTO, ResponseDTO, ID> imp
 
     protected JpaRepository<T, ID> repository;
     protected GenericMapper<T, RequestDTO, ResponseDTO> mapper;
-
-
-
-
 
     @Override
     public ResponseDTO save(RequestDTO requestDto) {
@@ -36,9 +36,23 @@ public abstract class GenericCrudServiceImpl<T, RequestDTO, ResponseDTO, ID> imp
     }
 
     @Override
-    public List<ResponseDTO> findAll() {
-        return repository.findAll().stream().map(mapper::toDto).collect(Collectors.toList());
+    public PagedResponse<ResponseDTO> findAll(Pageable pageable) {
+        Page<T> pageResponse = repository.findAll(pageable);
+        List<ResponseDTO> responseDTOList = pageResponse.getContent()
+                .stream()
+                .map(mapper::toDto)
+                .collect(Collectors.toList());
+
+        return new PagedResponse<>(
+                responseDTOList,
+                pageResponse.getNumber(),
+                pageResponse.getSize(),
+                pageResponse.getTotalElements(),
+                pageResponse.getTotalPages(),
+                pageResponse.isLast()
+        );
     }
+
 
     @Override
     public void deleteById(ID id) {

@@ -1,5 +1,8 @@
 package com.youcode.itlens.common.services;
 
+import com.youcode.itlens.survey.application.dtos.PagedResponse;
+import org.springframework.data.domain.Pageable;
+
 import java.util.List;
 
 public interface CrudService<RequestDTO, ResponseDTO, ID> {
@@ -9,7 +12,7 @@ public interface CrudService<RequestDTO, ResponseDTO, ID> {
 
     ResponseDTO findById(ID id);
 
-    List<ResponseDTO> findAll();
+    PagedResponse<ResponseDTO> findAll(Pageable pageable);
 
     void deleteById(ID id);
 }

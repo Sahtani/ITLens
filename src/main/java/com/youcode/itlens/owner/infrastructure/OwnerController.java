@@ -3,9 +3,11 @@ package com.youcode.itlens.owner.infrastructure;
 import com.youcode.itlens.owner.application.dtos.OwnerRequestDTO;
 import com.youcode.itlens.owner.application.dtos.OwnerResponseDTO;
 import com.youcode.itlens.owner.application.services.OwnerService;
+import com.youcode.itlens.survey.application.dtos.PagedResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,8 +37,8 @@ public class OwnerController {
     }
 
     @GetMapping
-    public ResponseEntity<List<OwnerResponseDTO>> getAll() {
-        List<OwnerResponseDTO> owners = ownerService.getAll();
+    public ResponseEntity<PagedResponse<OwnerResponseDTO>> getAll(Pageable pageable) {
+        PagedResponse<OwnerResponseDTO> owners = ownerService.getAll(pageable);
         return new ResponseEntity<>(owners, HttpStatus.OK);
     }
 

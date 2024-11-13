@@ -1,5 +1,6 @@
 package com.youcode.itlens.survey.application.services.Implementations;
 
+import com.youcode.itlens.survey.application.dtos.PagedResponse;
 import com.youcode.itlens.survey.application.dtos.SurveyEdition.SurveyEditionRequestDTO;
 import com.youcode.itlens.survey.application.dtos.SurveyEdition.SurveyEditionResponseDTO;
 import com.youcode.itlens.survey.application.mappers.SurveyEditionMapper;
@@ -11,11 +12,15 @@ import com.youcode.itlens.survey.domain.repository.SurveyRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @Transactional
 @Validated
@@ -28,11 +33,23 @@ public class SurveyEditionServiceImpl implements SurveyEditionService {
 
 
     @Override
-    public List<SurveyEditionResponseDTO> getAll() {
-        return repository.findAll()
-                .stream().map(mapper::toDto)
-                .toList();
+    public PagedResponse<SurveyEditionResponseDTO> getAll(Pageable pageable) {
+        Page<SurveyEdition> surveyEditionsPage = repository.findAll(pageable);
+        List<SurveyEditionResponseDTO> surveyEditionResponseDTOS = surveyEditionsPage.getContent()
+                .stream()
+                .map(mapper::toDto)
+                .collect(Collectors.toList());
+
+        return new PagedResponse<>(
+                surveyEditionResponseDTOS,
+                surveyEditionsPage.getNumber(),
+                surveyEditionsPage.getSize(),
+                surveyEditionsPage.getTotalElements(),
+                surveyEditionsPage.getTotalPages(),
+                surveyEditionsPage.isLast()
+        );
     }
+
 
     @Override
     public SurveyEditionResponseDTO getById(Long id) {

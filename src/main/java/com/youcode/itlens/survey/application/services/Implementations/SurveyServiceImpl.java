@@ -2,15 +2,19 @@ package com.youcode.itlens.survey.application.services.Implementations;
 
 import com.youcode.itlens.owner.domain.Owner;
 import com.youcode.itlens.owner.domain.OwnerRepository;
+import com.youcode.itlens.survey.application.dtos.PagedResponse;
 import com.youcode.itlens.survey.application.dtos.Survey.SurveyRequestDTO;
 import com.youcode.itlens.survey.application.dtos.Survey.SurveyResponseDTO;
 import com.youcode.itlens.survey.application.mappers.SurveyMapper;
 import com.youcode.itlens.survey.application.services.SurveyService;
+import com.youcode.itlens.survey.domain.entities.Answer;
 import com.youcode.itlens.survey.domain.entities.Survey;
 import com.youcode.itlens.survey.domain.repository.SurveyRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -27,12 +31,22 @@ public class SurveyServiceImpl implements SurveyService {
     private final SurveyMapper mapper;
 
     @Override
-    public List<SurveyResponseDTO> getAll() {
-
-        return surveyRepository.findAll()
-                .stream().map(mapper::toDto)
+    public PagedResponse<SurveyResponseDTO> getAll(Pageable pageable) {
+        Page<Survey> answerPage = surveyRepository.findAll(pageable);
+        List<SurveyResponseDTO> surveyResponseDTOS = answerPage.getContent().stream()
+                .map(mapper::toDto)
                 .toList();
+
+        return new PagedResponse<>(
+                surveyResponseDTOS,
+                answerPage.getNumber(),
+                answerPage.getSize(),
+                answerPage.getTotalElements(),
+                answerPage.getTotalPages(),
+                answerPage.isLast()
+        );
     }
+
 
     @Override
     public SurveyResponseDTO getById(Long id) {

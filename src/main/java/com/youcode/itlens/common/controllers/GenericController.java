@@ -1,7 +1,9 @@
 package com.youcode.itlens.common.controllers;
 
 import com.youcode.itlens.common.services.CrudService;
+import com.youcode.itlens.survey.application.dtos.PagedResponse;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,10 +31,11 @@ public abstract class GenericController<RequestDTO, ResponseDTO, ID> {
     }
 
     @GetMapping
-    public ResponseEntity<List<ResponseDTO>> getAll() {
-        List<ResponseDTO> responseList = service.findAll();
-        return ResponseEntity.ok(responseList);
+    public ResponseEntity<PagedResponse<ResponseDTO>> getAll(Pageable pageable) {
+        PagedResponse<ResponseDTO> responsePage = service.findAll(pageable);
+        return ResponseEntity.ok(responsePage);
     }
+
 
     @PutMapping("/{id}")
     public ResponseEntity<ResponseDTO> update(@PathVariable ID id, @RequestBody @Valid RequestDTO requestDto) {
