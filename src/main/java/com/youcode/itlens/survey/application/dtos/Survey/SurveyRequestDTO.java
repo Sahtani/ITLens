@@ -9,7 +9,7 @@ import jakarta.validation.constraints.NotNull;
 
 public record SurveyRequestDTO(
 
-        @NotBlank @Unique(fieldName = "title", entityClass = Survey.class) String title,
+        @NotBlank @Unique(fieldName = "title", entityClass = Survey.class,message = "title must be unique") String title,
         @NotBlank String description,
         @NotNull @Existe(entityClass = Owner.class, fieldName = "id", message = "The specified owner does not exist.") Long ownerId) {
 }

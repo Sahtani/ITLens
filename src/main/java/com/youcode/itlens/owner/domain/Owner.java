@@ -31,4 +31,7 @@ public class Owner {
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
     private Set<Survey> surveys;
 
+    public Owner(String name) {
+        this.name = name;
+    }
 }
