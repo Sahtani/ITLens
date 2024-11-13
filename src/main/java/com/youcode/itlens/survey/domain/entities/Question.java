@@ -25,7 +25,6 @@ public class Question {
 
     private String text;
 
-    @NotBlank
     @Enumerated(EnumType.STRING)
     private QuestionType type;
 

@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import java.util.List;
+
 @Entity
 @Table(name = "surveys")
 @Getter
@@ -30,6 +32,9 @@ public class Survey {
 
     @ManyToOne
     private Owner owner;
+
+    @OneToMany(mappedBy = "survey", cascade = CascadeType.REMOVE, fetch = FetchType.EAGER)
+    private List<SurveyEdition> surveyEditions ;
 
 
 }

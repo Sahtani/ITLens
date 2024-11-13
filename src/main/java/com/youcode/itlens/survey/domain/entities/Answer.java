@@ -20,6 +20,7 @@ public class Answer {
     private Long id;
 
     private String text;
+
     private int selectionCount;
 
     private double percentage;

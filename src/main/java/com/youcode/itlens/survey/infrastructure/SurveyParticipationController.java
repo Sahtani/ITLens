@@ -1,7 +1,12 @@
 package com.youcode.itlens.survey.infrastructure;
 
+import com.youcode.itlens.common.annotations.declarations.Existe;
 import com.youcode.itlens.survey.application.dtos.Participate.SurveyParticipationRequestDTO;
+import com.youcode.itlens.survey.application.dtos.Participate.SurveyResultDTO;
 import com.youcode.itlens.survey.application.services.SurveyParticipationService;
+import com.youcode.itlens.survey.application.services.SurveyResultService;
+import com.youcode.itlens.survey.domain.entities.Survey;
+import com.youcode.itlens.survey.domain.entities.SurveyEdition;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,28 +21,21 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SurveyParticipationController {
 
-    private SurveyParticipationService surveyParticipationService;
+    private final SurveyParticipationService surveyParticipationService;
 
-    /**
-     * Endpoint to handle survey participation.
-     *
-     * @param request The survey participation request (containing responses).
-     * @return A response indicating the success or failure of the operation.
-     */
-    @PostMapping("/participate")
-    public ResponseEntity<String> participate(@RequestBody SurveyParticipationRequestDTO request) {
-        try {
-            // Process the survey participation
-            surveyParticipationService.handleSurveyParticipation(request);
+    private final SurveyResultService surveyResultService;
 
-            // Return success response
-            return ResponseEntity.ok("Survey participation successfully recorded.");
-        } catch (EntityNotFoundException e) {
-            // Handle entity not found exception (e.g., question or answer not found)
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Entity not found: " + e.getMessage());
-        } catch (Exception e) {
-            // Handle any other unexpected errors
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + e.getMessage());
-        }
+
+    @PostMapping("/{id}/participate")
+    public ResponseEntity<String> participateSurvey(@Existe(entityClass = Survey.class, fieldName = "id", message = "No survey edition with this ID") @PathVariable("id") Long surveyId,
+                                                    @RequestBody @Valid SurveyParticipationRequestDTO dto) {
+        surveyParticipationService.participate(surveyId, dto);
+        return new ResponseEntity<>("\n" +
+                "Participation successfully registered", HttpStatus.OK);
+    }
+    @GetMapping("/{id}/results")
+    public ResponseEntity<SurveyResultDTO> getSurveyResults(@PathVariable("id") Long surveyId) {
+        SurveyResultDTO surveyResult = surveyResultService.getSurveyResults(surveyId);
+        return new ResponseEntity<>(surveyResult, HttpStatus.OK);
     }
 }
