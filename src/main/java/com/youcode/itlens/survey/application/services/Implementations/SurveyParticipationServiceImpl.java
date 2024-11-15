@@ -8,8 +8,12 @@ import com.youcode.itlens.survey.application.services.SurveyParticipationService
 import com.youcode.itlens.survey.domain.entities.Answer;
 import com.youcode.itlens.survey.domain.entities.Question;
 import com.youcode.itlens.survey.domain.enums.QuestionType;
+import com.youcode.itlens.survey.domain.exception.AnswerQuestionMismatchException;
+import com.youcode.itlens.survey.domain.exception.InvalidMultipleChoiceAnswerException;
+import com.youcode.itlens.survey.domain.exception.InvalidSingleChoiceAnswerException;
 import com.youcode.itlens.survey.domain.repository.AnswerRepository;
 import com.youcode.itlens.survey.domain.repository.QuestionRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -42,15 +46,17 @@ public class SurveyParticipationServiceImpl implements SurveyParticipationServic
             // Handle Single Choice Questions
             if (question.getType() == QuestionType.SINGLE_CHOICE) {
                 if (responseDTO.answerId() == null || responseDTO.answers() != null) {
-                    throw new IllegalArgumentException("Only one answer is required for single-choice question ID = " + question.getId());
-                }
+                    throw new InvalidSingleChoiceAnswerException(
+                            "Only one answer is required for single-choice question ID = " + question.getId()
+                    );      }
 
                 Answer answer = answerRepository.findById(responseDTO.answerId())
-                        .orElseThrow(() -> new IllegalArgumentException("Answer not found"));
+                        .orElseThrow(() -> new EntityNotFoundException("Answer not found"));
 
                 if (!answer.getQuestion().getId().equals(question.getId())) {
-                    throw new IllegalArgumentException("Answer ID = " + responseDTO.answerId() + " does not belong to question ID = " + question.getId());
-                }
+                    throw new AnswerQuestionMismatchException(
+                            "Answer ID = " + responseDTO.answerId() + " does not belong to question ID = " + question.getId()
+                    );    }
 
                 answer.incrementSelectionCount();
                 answerRepository.save(answer);
@@ -61,15 +67,16 @@ public class SurveyParticipationServiceImpl implements SurveyParticipationServic
                 // Handle Multiple Choice Questions
             } else if (question.getType() == QuestionType.MULTIPLE_CHOICE) {
                 if (responseDTO.answers() == null || responseDTO.answers().isEmpty() || responseDTO.answerId() != null) {
-                    throw new IllegalArgumentException("Multiple answers are required for multiple-choice question ID = " + question.getId());
-                }
+                    throw new InvalidMultipleChoiceAnswerException(
+                            "Multiple answers are required for multiple-choice question ID = " + question.getId()
+                    );    }
 
                 for (AnswerDTO answerDTO : responseDTO.answers()) {
                     Answer answer = answerRepository.findById(answerDTO.answerId())
-                            .orElseThrow(() -> new IllegalArgumentException("Answer not found"));
+                            .orElseThrow(() -> new EntityNotFoundException("Answer not found"));
 
                     if (!answer.getQuestion().getId().equals(question.getId())) {
-                        throw new IllegalArgumentException("Answer ID = " + answerDTO.answerId() + " does not belong to question ID = " + question.getId());
+                        throw new AnswerQuestionMismatchException("Answer ID = " + answerDTO.answerId() + " does not belong to question ID = " + question.getId());
                     }
 
                     answer.incrementSelectionCount();

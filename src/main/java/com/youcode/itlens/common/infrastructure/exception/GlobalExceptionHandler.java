@@ -1,8 +1,7 @@
 package com.youcode.itlens.common.infrastructure.exception;
 
 import com.youcode.itlens.common.domain.ErrorResponse;
-import com.youcode.itlens.survey.domain.exception.ChapterHasSubChaptersException;
-import com.youcode.itlens.survey.domain.exception.DuplicateChapterTitleException;
+import com.youcode.itlens.survey.domain.exception.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
@@ -90,5 +89,21 @@ public class GlobalExceptionHandler {
         );
 
 
+    }
+    @ExceptionHandler(InvalidSingleChoiceAnswerException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleInvalidSingleChoiceAnswerException(InvalidSingleChoiceAnswerException ex) {
+        return ex.getMessage();
+    }
+
+    @ExceptionHandler(AnswerQuestionMismatchException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleAnswerQuestionMismatchException(AnswerQuestionMismatchException ex) {
+        return ex.getMessage();
+    }
+    @ExceptionHandler(InvalidMultipleChoiceAnswerException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleInvalidMultipleChoiceAnswerException(InvalidMultipleChoiceAnswerException ex) {
+        return ex.getMessage();
     }
 }

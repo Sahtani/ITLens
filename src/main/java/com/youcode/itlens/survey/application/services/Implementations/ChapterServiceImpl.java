@@ -11,6 +11,7 @@ import com.youcode.itlens.survey.domain.exception.DuplicateChapterTitleException
 import com.youcode.itlens.survey.domain.repository.ChapterRepository;
 import com.youcode.itlens.survey.domain.repository.SurveyEditionRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -18,6 +19,7 @@ import java.util.List;
 
 @Validated
 @Service
+@Transactional
 public class ChapterServiceImpl extends GenericCrudServiceImpl<Chapter, ChapterRequestDTO, ChapterResponseDTO, Long> implements ChapterService {
 
     private final ChapterRepository chapterRepository;
@@ -44,7 +46,6 @@ public class ChapterServiceImpl extends GenericCrudServiceImpl<Chapter, ChapterR
     public ChapterResponseDTO save(ChapterRequestDTO requestDto) {
         SurveyEdition surveyEdition = surveyEditionRepository.findById(requestDto.surveyEditionId()).orElseThrow(() -> new EntityNotFoundException("Survey edition with ID " + requestDto.surveyEditionId() + " not found"));
 
-        // Check for duplicate chapter title in the same survey edition
         chapterRepository.findByTitleAndSurveyEditionId(requestDto.title(), requestDto.surveyEditionId()).ifPresent(chapter -> {
             throw new DuplicateChapterTitleException(requestDto.title(), requestDto.surveyEditionId());
         });
