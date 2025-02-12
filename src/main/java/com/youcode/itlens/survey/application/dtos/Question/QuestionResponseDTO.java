@@ -9,7 +9,7 @@ import java.util.List;
 
 public record QuestionResponseDTO(@NotNull Long id,
                                   @NotBlank String text,
-                                  @NotNull QuestionType questionType,
+                                  @NotNull QuestionType type,
                                   @NotNull ChapterEmbeddableDTO chapter
 ) {
 }

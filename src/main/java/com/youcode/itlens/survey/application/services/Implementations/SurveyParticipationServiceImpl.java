@@ -43,7 +43,6 @@ public class SurveyParticipationServiceImpl implements SurveyParticipationServic
                 throw new IllegalArgumentException("Question " + responseDTO.questionId() + " does not belong to survey " + surveyId);
             }
 
-            // Handle Single Choice Questions
             if (question.getType() == QuestionType.SINGLE_CHOICE) {
                 if (responseDTO.answerId() == null || responseDTO.answers() != null) {
                     throw new InvalidSingleChoiceAnswerException(

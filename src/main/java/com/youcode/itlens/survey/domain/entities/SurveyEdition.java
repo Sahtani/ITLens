@@ -43,6 +43,6 @@ public class SurveyEdition {
 
 
     @OneToMany(mappedBy = "surveyEdition", fetch = FetchType.EAGER)
-    private List<Chapter> chapters;
+    private List<Chapter> chapters = new ArrayList<>();
 
 }

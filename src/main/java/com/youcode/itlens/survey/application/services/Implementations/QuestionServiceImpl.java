@@ -48,7 +48,6 @@ public class QuestionServiceImpl extends GenericCrudServiceImpl<Question, Questi
         Chapter chapter = chapterRepository.findById(requestDTO.chapterId()).orElseThrow(() -> new EntityNotFoundException("Chapter with ID " + requestDTO.chapterId() + " not found."));
             Question question = mapper.toEntity(requestDTO);
 
-            // set the chapter
             question.setChapter(chapter);
 
             //  add each response to the question if they exist in the request DTO

@@ -54,6 +54,9 @@ public abstract class GenericCrudServiceImpl<T, RequestDTO, ResponseDTO, ID> imp
 
     @Override
     public void deleteById(ID id) {
+        if (!repository.existsById(id)) {
+            throw new EntityNotFoundException("L'entité avec l'ID " + id + " n'existe pas.");
+        }
         repository.deleteById(id);
     }
 

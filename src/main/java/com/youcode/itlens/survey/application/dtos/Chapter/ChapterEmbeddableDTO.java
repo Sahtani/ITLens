@@ -1,11 +1,17 @@
 package com.youcode.itlens.survey.application.dtos.Chapter;
 
+import com.youcode.itlens.survey.application.dtos.Question.QuestionDTO;
+import com.youcode.itlens.survey.application.dtos.Question.QuestionEmbeddableDTO;
 import com.youcode.itlens.survey.application.dtos.SurveyEdition.SurveyEditionEmbeddableDTO;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.List;
+
 public record ChapterEmbeddableDTO (@NotNull Long id,
-                                   @NotBlank String title,
-                                   @NotNull SurveyEditionEmbeddableDTO surveyEdition
+                                    @NotBlank String title,
+                                    List<ChapterEmbeddableDTO> subChapters,
+                                    List<QuestionEmbeddableDTO> questions
+
 ) {
 }

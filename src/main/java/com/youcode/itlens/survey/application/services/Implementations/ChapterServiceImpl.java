@@ -3,12 +3,18 @@ package com.youcode.itlens.survey.application.services.Implementations;
 import com.youcode.itlens.common.services.GenericCrudServiceImpl;
 import com.youcode.itlens.survey.application.dtos.Chapter.ChapterRequestDTO;
 import com.youcode.itlens.survey.application.dtos.Chapter.ChapterResponseDTO;
+import com.youcode.itlens.survey.application.dtos.Chapter.ChapterWithQuestionsRequestDTO;
 import com.youcode.itlens.survey.application.mappers.ChapterMapper;
+import com.youcode.itlens.survey.application.mappers.QuestionMapper;
 import com.youcode.itlens.survey.application.services.ChapterService;
+import com.youcode.itlens.survey.application.services.QuestionService;
+import com.youcode.itlens.survey.domain.entities.Answer;
 import com.youcode.itlens.survey.domain.entities.Chapter;
+import com.youcode.itlens.survey.domain.entities.Question;
 import com.youcode.itlens.survey.domain.entities.SurveyEdition;
 import com.youcode.itlens.survey.domain.exception.DuplicateChapterTitleException;
 import com.youcode.itlens.survey.domain.repository.ChapterRepository;
+import com.youcode.itlens.survey.domain.repository.QuestionRepository;
 import com.youcode.itlens.survey.domain.repository.SurveyEditionRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -25,12 +31,16 @@ public class ChapterServiceImpl extends GenericCrudServiceImpl<Chapter, ChapterR
     private final ChapterRepository chapterRepository;
     private final SurveyEditionRepository surveyEditionRepository;
     private final ChapterMapper mapper;
+    private final QuestionRepository questionRepository;
+    private final QuestionMapper questionMapper;
 
-    public ChapterServiceImpl(ChapterRepository chapterRepository, ChapterMapper mapper, SurveyEditionRepository surveyEditionRepository) {
+    public ChapterServiceImpl(ChapterRepository chapterRepository, ChapterMapper mapper, SurveyEditionRepository surveyEditionRepository, QuestionRepository questionRepository, QuestionMapper questionMapper) {
         super(chapterRepository, mapper);
         this.chapterRepository = chapterRepository;
         this.surveyEditionRepository = surveyEditionRepository;
         this.mapper = mapper;
+        this.questionRepository = questionRepository;
+        this.questionMapper = questionMapper;
     }
 
     @Override
@@ -41,6 +51,23 @@ public class ChapterServiceImpl extends GenericCrudServiceImpl<Chapter, ChapterR
 
         return chapterRepository.findAllBySurveyEditionId(editionId).stream().map(mapper::toDto).toList();
     }
+
+//    public ChapterWithQuestionsRequestDTO saveChapterWithQuestions(ChapterWithQuestionsRequestDTO requestDto) {
+//        SurveyEdition surveyEdition = surveyEditionRepository.findById(requestDto.surveyEditionId()).orElseThrow(() -> new EntityNotFoundException("Survey edition with ID " + requestDto.surveyEditionId() + " not found"));
+//
+//        chapterRepository.findByTitleAndSurveyEditionId(requestDto.title(), requestDto.surveyEditionId()).ifPresent(chapter -> {
+//            throw new DuplicateChapterTitleException(requestDto.title(), requestDto.surveyEditionId());
+//        });
+//
+//        Chapter chapter = mapper.toEntity(requestDto);
+//        chapter.setSurveyEdition(surveyEdition);
+//
+//        // If parentChapterId is provided, set the parent chapter
+//        if (requestDto.parentChapterId() != null) {
+//            Chapter parentChapter = chapterRepository.findById(requestDto.parentChapterId()).orElseThrow(() -> new EntityNotFoundException("Parent chapter with ID " + requestDto.parentChapterId() + " not found"));
+//            chapter.setParentChapter(parentChapter);
+//        }
+//    }
 
     @Override
     public ChapterResponseDTO save(ChapterRequestDTO requestDto) {
@@ -57,6 +84,14 @@ public class ChapterServiceImpl extends GenericCrudServiceImpl<Chapter, ChapterR
         if (requestDto.parentChapterId() != null) {
             Chapter parentChapter = chapterRepository.findById(requestDto.parentChapterId()).orElseThrow(() -> new EntityNotFoundException("Parent chapter with ID " + requestDto.parentChapterId() + " not found"));
             chapter.setParentChapter(parentChapter);
+        }
+        if (requestDto.questionRequestDTOS() != null) {
+            List<Question> questions = requestDto.questionRequestDTOS().stream().map(responseDTO -> {
+                Question question = questionMapper.toEntity(responseDTO);
+                question.setChapter(chapter);
+               return question;
+            }).toList();
+            chapter.setQuestions(questions);
         }
         Chapter savedChapter = chapterRepository.save(chapter);
         return mapper.toDto(savedChapter);

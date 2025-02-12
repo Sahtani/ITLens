@@ -8,11 +8,11 @@ import java.lang.annotation.*;
 
 @Documented
 @Constraint(validatedBy = ExistValidator.class)
-@Target({ElementType.PARAMETER, ElementType.FIELD})
+@Target({ElementType.PARAMETER, ElementType.FIELD,ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Existe {
 
-    String message() default "L'entité n'existe pas";
+    String message() default "The specified entity does not exist.";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 
